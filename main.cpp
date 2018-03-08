@@ -33,22 +33,24 @@ using namespace NTL;
 */
 
 
+/*
 //DDLOG Procedure Functions
 ZZ ddlog(ZZ a,ZZ delta,ZZ M,ZZ phi){
-	ZZ i = ZZ(0);
-	ZZ h = a;
-	// natural log in NTL?
+    ZZ i = ZZ(0);
+    ZZ h = a;
+    // natural log in NTL?
 
-	ZZ T = 2*M*log(2/delta)/delta;
+    ZZ T = 2*M*log(2/delta)/delta;
 
-	while(delta(h) != 0 && i < T)
-	{
-		h = g*h;
-		i = i + 1;
-	}
+    while(delta(h) != 0 && i < T)
+    {
+        h = g*h;
+        i = i + 1;
+    }
 
-	return i;
+    return i;
 }
+*/
 
 //delta is the random function that returns a random integer from 0 to k-1
 ZZ delta(ZZ k){
@@ -81,7 +83,7 @@ ZZ encrypt(ZZ m, ZZ n, ZZ g)
 	// Create random # from 0 to n-1
 	r = RandomBnd(n);
 	//hardcoded r to 131 for testing
-	r = ZZ(131)git ;
+	r = ZZ(131);
 	cout << "r = " << r << endl;
 
 	// Computes power of stuff
