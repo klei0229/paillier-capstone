@@ -13,5 +13,5 @@
 LIBS:=ntl gmp m ssl crypto
 LIBFLAGS:=$(addprefix -l, $(LIBS));
 
-main : main.cpp
-	g++ -g -Wall -Wpedantic $< -o $@ $(LIBFLAGS)
+main : main.cpp paillier.cpp
+	g++ -g -Wall -Wpedantic $^ -o $@ $(LIBFLAGS)
