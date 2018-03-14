@@ -34,7 +34,7 @@ int main()
   cout << "n = " << n << endl;
   cout << "lamdba = " << lambda << endl;
 
-	ZZ c = paillier.encrypt(m);
+	ZZ c = paillier.encrypt(m, (NTL::ZZ)131 );
 	cout << "c = " << c << endl;
 	ZZ m2 = paillier.decrypt(c);
 	cout << "m2 = " << m2 << endl;
