@@ -49,8 +49,16 @@ NTL::ZZ Paillier::encrypt(NTL::ZZ message) {
         NTL::PowerMod(generator, message, modulus * modulus) *
         NTL::PowerMod(random, modulus, modulus * modulus);
     return ciphertext % (modulus * modulus);
-           
 }
+
+NTL::ZZ Paillier::encrypt(NTL::ZZ message, NTL::ZZ random) {
+    NTL::ZZ ciphertext = 
+        NTL::PowerMod(generator, message, modulus * modulus) *
+        NTL::PowerMod(random, modulus, modulus * modulus);
+    return ciphertext % (modulus * modulus);
+}
+
+
 NTL::ZZ Paillier::decrypt(NTL::ZZ ciphertext) {
     /* NOTE: NTL::PowerMod will fail if the first input is too large
      * (which I assume means larger than modulus).

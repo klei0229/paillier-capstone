@@ -23,6 +23,22 @@ class Paillier {
      */
     NTL::ZZ encrypt(NTL::ZZ message); 
 
+    /* Paillier encryption function with provided randomness, if user
+     * wants to provide their own randomness.
+     *
+     * Random number should be coprime to modulus.
+     *
+     * Parameters
+     * ==========
+     * NTL::ZZ message : The message to encrypt, as a number.
+     * NTL::ZZ random : The random mask.
+     *
+     * Returns
+     * =======
+     * NTL:ZZ ciphertext : The encyrpted message.
+     */
+    NTL::ZZ encrypt(NTL::ZZ message, NTL::ZZ random); 
+
     /* Paillier decryption function. Takes in a cipertext from Z mod
      * n**2 and returns a message in the Z mod n.
      *
