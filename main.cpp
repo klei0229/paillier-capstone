@@ -1,3 +1,5 @@
+#include <NTL/ZZ.h>
+#include <NTL/RR.h>
 #include <NTL/ZZ_pXFactoring.h>
 #include <iostream>
 #include <math.h>
@@ -6,19 +8,71 @@
 #include <time.h>
 #include <assert.h>
 
+// For SHA hashing.
+#include <openssl/sha.h>
+
 using namespace std;
 using namespace NTL;
 
 /*
-	To compile:
-	g++ -g -O2 main2.cpp -o main -lntl -lgmp -lm
+ * - Generate number relatively prime to another number.
+ * - Organize Paillier crytpo into a class, which has encrypt,
+ *   decrypt, and key generation functions, with the option of
+ *   providing keys yourself (if you want).
+ */
 
-	compile on my vm:
-	g++ -g -O2 -I/home/kevin/usr/local/include main2.cpp -o main -L/home/kevin/usr/local/lib/ -lntl -lgmp -lm
+ZZ generateCoprimeNumber(ZZ n) {
+    ZZ ret;
+    while (true) {
+        ret = RandomBnd(n);
+        if (GCD(ret, n) == 1) { return ret; }
+    }
+}
 
-	To run:
-	./main
-*/
+unsigned char * numToBytes(ZZ num) {
+    unsigned char * buf;
+    long numBytes = NumBytes(num);
+    buf = new unsigned char[numBytes];
+    NTL::BytesFromZZ(buf, num, numBytes);
+    cout << "Num Bytes in number: " << numBytes << endl;
+    return buf;
+}
+
+/* The silly name is due to some other function named `hash`. I will
+ * figure out an unambiguous name later.
+ */
+ZZ hashZZ(ZZ num) {
+    long hashBytes = 160/8;
+    unsigned char * buf = numToBytes(num);
+    long numBytes = NTL::NumBytes(num);
+    // Output of sha1 is 160 bits, which is 160/8 = 20 bytes.
+    unsigned char * output = new unsigned char[hashBytes];
+    SHA1(buf, numBytes, output);
+    cout << "Hash:" << endl;
+    for (int i = 0; i < hashBytes; i++) {
+        printf("%02x", output[i]);
+    }
+    cout << endl;
+    ZZ ret = NTL::ZZFromBytes(output, hashBytes);
+    cout << "Hash as number: " << ret << endl;
+    delete buf;
+    delete output;
+    return ret;
+}
+
+bool isSpecialPoint(ZZ num, double delta) {
+    long hashBytes = 160/8;
+    RR maxValue = NTL::MakeRR(((ZZ)1 << (hashBytes * 8)) - 1, 0);
+    ZZ threshold = NTL::RoundToZZ(maxValue * delta);
+    cout << "maximum hash value: " << maxValue << endl;
+    cout << "Threshold: " << threshold << endl;
+    ZZ hash = hashZZ(num);
+    cout << "Hash: " << hash << endl;
+    cout << threshold - hash << endl;
+    bool ret = hash <= threshold;
+    hash.kill();
+    return ret;
+}
 
 /*
 	To do list:
@@ -58,7 +112,6 @@ ZZ delta(ZZ k){
 	r = RandomBnd(k);
 	return r;
 }
-//
 
 
 ZZ L_function(ZZ x,ZZ n){
@@ -176,5 +229,8 @@ int main()
 		cout << "m = m2, encryption and decryption successful" << endl;
 
 	}
+
+  ZZ number = (ZZ)97;
+  cout << isSpecialPoint(number, 0.5) << endl;
 	return 0;
 }

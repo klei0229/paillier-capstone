@@ -3,8 +3,15 @@
 #g++ -g $< -o $@ -lntl
 #g++ -g $< -o $@
 #
-# From what I can tell, libm is an implementation of C math functions.
-# Why would we need this?
+
+# - ntl: Number theory library
+# - gmp: Arbitrary precision arithmetic.
+# - ssl + crytpo: For openssl. Installed on most linux machines, and
+#   has hashing algorithms.
+# - m: From what I can tell, libm is an implementation of C math
+#   functions. Why would we need this?
+LIBS:=ntl gmp m ssl crypto
+LIBFLAGS:=$(addprefix -l, $(LIBS));
 
 main : main.cpp
-	g++ -g $< -o $@ -lntl -lgmp -lm
+	g++ -g -Wall -Wpedantic $< -o $@ $(LIBFLAGS)
