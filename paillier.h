@@ -1,12 +1,11 @@
 #include <NTL/ZZ.h>
-#include <NTL/RR.h>
 #include <NTL/ZZ_pXFactoring.h>
 
 class Paillier {
     public:
     /* Completely generate everything, from scratch */
     Paillier();
-    Paillier(NTL::ZZ modulus, NTL::ZZ lambda); 
+    Paillier(const NTL::ZZ& modulus, const NTL::ZZ& lambda); 
     //Paillier(path to public key, path to private key).
 
     /* Paillier encryption function. Takes in a message from the
@@ -21,7 +20,7 @@ class Paillier {
      * =======
      * NTL:ZZ ciphertext : The encyrpted message.
      */
-    NTL::ZZ encrypt(NTL::ZZ message); 
+    NTL::ZZ encrypt(const NTL::ZZ& message); 
 
     /* Paillier encryption function with provided randomness, if user
      * wants to provide their own randomness.
@@ -37,7 +36,7 @@ class Paillier {
      * =======
      * NTL:ZZ ciphertext : The encyrpted message.
      */
-    NTL::ZZ encrypt(NTL::ZZ message, NTL::ZZ random); 
+    NTL::ZZ encrypt(const NTL::ZZ& message, const NTL::ZZ& random); 
 
     /* Paillier decryption function. Takes in a cipertext from Z mod
      * n**2 and returns a message in the Z mod n.
@@ -50,7 +49,7 @@ class Paillier {
      * =======
      * NTL::ZZ message : The original message.
      */
-    NTL::ZZ decrypt(NTL::ZZ ciphertext); 
+    NTL::ZZ decrypt(const NTL::ZZ& ciphertext); 
 
     private:
     /* modulus = pq, where p and q are primes */
@@ -72,7 +71,7 @@ class Paillier {
      * =======
      * NTL::ZZ result : (x - 1) / n
      */
-    NTL::ZZ L_function(NTL::ZZ n) { return (n - 1) / modulus; }
+    NTL::ZZ L_function(const NTL::ZZ& n) { return (n - 1) / modulus; }
 
     void GenPrimePair(NTL::ZZ& p, NTL::ZZ& q, long keyLength); 
 };

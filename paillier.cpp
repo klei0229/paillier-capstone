@@ -1,6 +1,6 @@
 #include "paillier.h"
 
-NTL::ZZ generateCoprimeNumber(NTL::ZZ n) {
+NTL::ZZ generateCoprimeNumber(const NTL::ZZ& n) {
     NTL::ZZ ret;
     while (true) {
         ret = RandomBnd(n);
@@ -21,7 +21,7 @@ Paillier::Paillier() {
     lambdaInverse = NTL::InvMod(lambda, modulus);
 }
 
-Paillier::Paillier(NTL::ZZ modulus, NTL::ZZ lambda) {
+Paillier::Paillier(const NTL::ZZ& modulus, const NTL::ZZ& lambda) {
     this->modulus = modulus;
     generator = this->modulus + 1;
     this->lambda = lambda;
@@ -43,7 +43,7 @@ void Paillier::GenPrimePair(NTL::ZZ& p, NTL::ZZ& q,
     }
 }
 
-NTL::ZZ Paillier::encrypt(NTL::ZZ message) {
+NTL::ZZ Paillier::encrypt(const NTL::ZZ& message) {
     NTL::ZZ random = generateCoprimeNumber(modulus);
     NTL::ZZ ciphertext = 
         NTL::PowerMod(generator, message, modulus * modulus) *
@@ -51,7 +51,7 @@ NTL::ZZ Paillier::encrypt(NTL::ZZ message) {
     return ciphertext % (modulus * modulus);
 }
 
-NTL::ZZ Paillier::encrypt(NTL::ZZ message, NTL::ZZ random) {
+NTL::ZZ Paillier::encrypt(const NTL::ZZ& message, const NTL::ZZ& random) {
     NTL::ZZ ciphertext = 
         NTL::PowerMod(generator, message, modulus * modulus) *
         NTL::PowerMod(random, modulus, modulus * modulus);
@@ -59,7 +59,7 @@ NTL::ZZ Paillier::encrypt(NTL::ZZ message, NTL::ZZ random) {
 }
 
 
-NTL::ZZ Paillier::decrypt(NTL::ZZ ciphertext) {
+NTL::ZZ Paillier::decrypt(const NTL::ZZ& ciphertext) {
     /* NOTE: NTL::PowerMod will fail if the first input is too large
      * (which I assume means larger than modulus).
      */
