@@ -11,40 +11,34 @@ using namespace std;
 using namespace NTL;
 
 ZZ lcm(ZZ x, ZZ y){
-
   ZZ ans = (x * y) / NTL::GCD(x,y);
-
   return ans;
-
 }
 
 int main()
 {
 
-	ZZ p = ZZ(43);
-	ZZ q = ZZ(41);
-  ZZ lambda = lcm(p - 1, q - 1);
-  Paillier paillier(p*q, lambda);
+    ZZ p = ZZ(43);
+    ZZ q = ZZ(41);
+    ZZ lambda = lcm(p - 1, q - 1);
+    Paillier paillier(p*q, lambda);
 
-	ZZ m = ZZ(10);
-	ZZ n = p * q;
+    ZZ m = ZZ(10);
+    ZZ n = p * q;
 
-	cout << "p = " << p << endl;
-  cout << "q = " << q << endl;
-  cout << "n = " << n << endl;
-  cout << "lamdba = " << lambda << endl;
+    cout << "p = " << p << endl;
+    cout << "q = " << q << endl;
+    cout << "n = " << n << endl;
+    cout << "lamdba = " << lambda << endl;
 
-	ZZ c = paillier.encrypt(m, (NTL::ZZ)131 );
-	cout << "c = " << c << endl;
-	ZZ m2 = paillier.decrypt(c);
-	cout << "m2 = " << m2 << endl;
+    ZZ c = paillier.encrypt(m, (ZZ)131 );
+    cout << "c = " << c << endl;
+    ZZ m2 = paillier.decrypt(c);
+    cout << "m2 = " << m2 << endl;
 
-	if (m == m2){
-		cout << "m = m2, encryption and decryption successful" << endl;
+    if (m == m2){
+        cout << "m = m2, encryption and decryption successful" << endl;
+    }
 
-	}
-
-	return 0;
+    return 0;
 }
-//730750818665451459101842416358141509827966271354 (my hash)
-//770532928004321317276586199312531973061171636152 (openssl)

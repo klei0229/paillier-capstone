@@ -63,8 +63,8 @@ NTL::ZZ Paillier::decrypt(NTL::ZZ ciphertext) {
     /* NOTE: NTL::PowerMod will fail if the first input is too large
      * (which I assume means larger than modulus).
      */
-    NTL::ZZ deMasked = NTL::PowerMod(ciphertext, lambda, 
-                                     modulus * modulus);
+    NTL::ZZ deMasked = NTL::PowerMod(
+            ciphertext, lambda, modulus * modulus);
     NTL::ZZ power = L_function(deMasked);
     return (power * lambdaInverse) % modulus;
 }
