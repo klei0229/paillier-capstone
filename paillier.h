@@ -51,8 +51,23 @@ class Paillier {
      */
     NTL::ZZ decrypt(const NTL::ZZ& ciphertext);
 
+
+    /*
+    Functions below are used for displaying private variables for debugging
+    */
+    NTL::ZZ getModulus();
+    NTL::ZZ getGenerator();
+    NTL::ZZ getP();
+    NTL::ZZ getQ();
+    NTL::ZZ getLambda();
+    NTL:: ZZ getLambdaInverse();
+
     private:
     /* modulus = pq, where p and q are primes */
+
+    NTL::ZZ P;
+    NTL::ZZ Q;
+
     NTL::ZZ modulus;
     NTL::ZZ generator;
     NTL::ZZ lambda;
@@ -87,4 +102,7 @@ class Paillier {
 
     */
     void GenPrimePair(NTL::ZZ& p, NTL::ZZ& q, long keyLength);
+
+
+
 };

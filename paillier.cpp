@@ -12,7 +12,7 @@ NTL::ZZ generateCoprimeNumber(const NTL::ZZ& n) {
 
 Paillier::Paillier() {
 
-    cout << "called constructor" << endl;
+    //cout << "called constructor" << endl;
     /* Length in bits. */
     long keyLength = 512;
     NTL::ZZ p, q;
@@ -28,7 +28,7 @@ Paillier::Paillier() {
     // LCM(p, q) = p * q / GCD(p, q);
     lambda = phi / NTL::GCD(p - 1, q - 1);
     lambdaInverse = NTL::InvMod(lambda, modulus);
-    cout << "end constructor" << endl;
+    //cout << "end constructor" << endl;
     //cout << P << " " << Q << " "<< modulus << " " << lambda << " " <<endl;
 }
 
@@ -49,8 +49,8 @@ void Paillier::GenPrimePair(NTL::ZZ& p, NTL::ZZ& q,
         NTL::ZZ n = p * q;
         NTL::ZZ phi = (p - 1) * (q - 1);
 
-        cout << "P: " << p << endl;
-        cout << "Q: " << q <<endl;
+        //cout << "P: " << p << endl;
+        //cout << "Q: " << q <<endl;
 
         if (NTL::GCD(n, phi) == 1) return;
     }
@@ -96,4 +96,8 @@ NTL::ZZ Paillier::getQ(){
 }
 NTL::ZZ Paillier::getLambda(){
   return lambda;
+}
+
+NTL::ZZ Paillier::getLambdaInverse(){
+  return lambdaInverse;
 }
