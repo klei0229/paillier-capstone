@@ -60,7 +60,13 @@ class Paillier {
     NTL::ZZ getP();
     NTL::ZZ getQ();
     NTL::ZZ getLambda();
-    NTL:: ZZ getLambdaInverse();
+    NTL::ZZ getLambdaInverse();
+
+    void setModulus(NTL::ZZ modulus);
+    void setGenerator(NTL::ZZ generator);
+    void setLambda(NTL::ZZ lambda);
+    void setLambdaInverse(NTL::ZZ lambdaInverse);
+
 
     private:
     /* modulus = pq, where p and q are primes */

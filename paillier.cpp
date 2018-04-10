@@ -101,3 +101,20 @@ NTL::ZZ Paillier::getLambda(){
 NTL::ZZ Paillier::getLambdaInverse(){
   return lambdaInverse;
 }
+
+//add set functions to decrypting
+
+void Paillier::setModulus(NTL::ZZ modulus){
+  this->modulus = modulus;
+}
+void Paillier::setGenerator(NTL::ZZ generator){
+  this->generator = generator;
+  }
+
+void Paillier::setLambda(NTL::ZZ lambda){
+  this->lambda = lambda;
+}
+
+void Paillier::setLambdaInverse(NTL::ZZ lambdaInverse){
+  this->lambdaInverse = lambdaInverse;
+}

@@ -158,18 +158,85 @@ int main()
         cout << "Decrypting cipher.txt and writing message into message.txt" << endl;
 
 
-        ofstream myfile ("cipher.txt");
-        if(myfile.is_open())
-        {
-          myfile <<"3409348089483290884930432\n";
-          myfile.close();
+        ZZ message_ZZ;
+        Paillier paillier;
 
+        ZZ modulus;
+        ZZ generator;
+        ZZ lambda;
+        ZZ lambdaInverse;
+
+        ZZ cipher;
+
+        string line;
+        ifstream cipher_file ("cipher.txt");
+        if(cipher_file.is_open())
+        {
+
+          getline(cipher_file,line);
+
+          cipher = ZZ(stringToNumber(line));
+          cipher_file.close();
         }
 
-        else cout << "Unable to open cipher.txt";
+        else{
+          cout << "Unable to open cipher.txt" << endl;
+        }
 
-    }
+        ifstream public_key_file ("public_key.txt");
+        if(public_key_file.is_open())
+        {
 
+          getline(public_key_file,line);
+          modulus = ZZ(stringToNumber(line));
+          getline(public_key_file,line);
+          generator = ZZ(stringToNumber(line));
+          public_key_file.close();
+        }
+        else{
+          cout << "Unable to open public_key.txt" << endl;
+        }
+
+        ifstream private_key_file ("private_key.txt");
+        if(private_key_file.is_open())
+        {
+
+          getline(private_key_file,line);
+          lambda = ZZ(stringToNumber(line));
+          getline(private_key_file,line);
+          lambdaInverse = ZZ(stringToNumber(line));
+          private_key_file.close();
+        }
+
+        else{
+          cout << "Unable to open private_key.txt" << endl;
+        }
+
+        paillier.setLambda(lambda);
+        paillier.setModulus(modulus);
+        paillier.setLambdaInverse(lambdaInverse);
+        paillier.setGenerator(generator);
+
+
+        //cout << "modulus" << modulus << endl;
+        //cout << "generator" << generator << endl;
+        //cout << "lambda" << lambda << endl;
+        //cout << "lambdaInverse" << lambdaInverse << endl;
+
+        message_ZZ = paillier.decrypt(cipher);
+        cout << "decrypted message is " << message_ZZ << endl;
+        cout << "Message m is stored back into message.txt" << endl;
+
+        ofstream message_file ("message.txt");
+        if(message_file.is_open())
+        {
+          message_file << message_ZZ;
+          message_file.close();
+        }
+
+        else cout << "Unable to open message.txt";
+
+      }
 
 
 
