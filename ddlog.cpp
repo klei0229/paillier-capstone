@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <sstream>
 
 #include <iomanip>
 
@@ -20,79 +21,73 @@ using namespace std;
 
 string decimalToHexical(int decimal_int){
 
-  int quotient = decimal_int;
-  int remainder_val;
-
   string hexString = "";
-  string hex_remainder;
+  stringstream ss;
 
-  while(quotient != 0){
+  // convert to hex and store in hexString
+  ss << hex << decimal_int;
+  hexString = ss.str();
 
-    remainder_val = quotient%16;
-
-    if(remainder_val == 0) hex_remainder ="0";
-    else if (remainder_val == 1) hex_remainder = "1";
-    else if (remainder_val == 2) hex_remainder = "2";
-    else if (remainder_val == 3) hex_remainder = "3";
-    else if (remainder_val == 4) hex_remainder = "4";
-    else if (remainder_val == 5) hex_remainder = "5";
-    else if (remainder_val == 6) hex_remainder = "6";
-    else if (remainder_val == 7) hex_remainder = "7";
-    else if (remainder_val == 8) hex_remainder = "8";
-    else if (remainder_val == 9) hex_remainder = "9";
-    else if (remainder_val == 10) hex_remainder = "a";
-    else if (remainder_val == 11) hex_remainder = "b";
-    else if (remainder_val == 12) hex_remainder = "c";
-    else if (remainder_val == 13) hex_remainder = "d";
-    else if (remainder_val == 14) hex_remainder = "e";
-    else hex_remainder = "F";
-
-    hexString.insert(0,hex_remainder);
-
-    //cout << hex_remainder << endl;
-
-    quotient = quotient/16;
-
-  }
-
-  //cout << hexString << endl;
   return hexString;
 
 }
 
-bool isSpecialPoint(string binaryString){
+bool isSpecialPoint(NTL::ZZ point)
+{
+  // ulong to store left most 64bits of point
+  // SHA1 = 160 bits, to get 64 we get rid of 96 bits
+  unsigned long LM64 = ((SHA1(point)) << 96);
 
-  int zeroCounter = 0;
-  int oneCounter = 0;
-
-  //cout << binaryString.length() << endl;
-  for (int i = 0 ; i < binaryString.length() ; i++)
+  // Special point if LM64 is a number where first 10 leading bits are 0s
+  // Biggest possible # is 0b0000000000111111111111111111111111111111111111111111111111111111
+  // in decimal = 18014398509481983
+  if( LM64 <= 18014398509481983 )
   {
-    //cout << binaryString[i] << endl;
-    if (binaryString[i] == '0')
-    {
-      zeroCounter++;
-
-    }
-
-    else if (binaryString[i] == '1')
-    {
-      oneCounter++;
-    }
-    else
-     {
-       cout << "recieved non binary input" << endl;
-     }
+	  return true;
   }
-    cout << "zeroes: " << zeroCounter << endl;
-    cout << "ones: " << oneCounter << endl;
+  else
+  {
+	  return false;
+  }
+}
 
-    if (zeroCounter > 10){
-      return true;
+int getStepsA(NTL::ZZ a, NTL::ZZ generator, NTL::ZZ modulus)
+{
+  // This func is to get # of steps for a to get to a special point
+
+  int steps = 0;
+  bool foundSpecial = false;
+  NTL::ZZ pointToCheck = a;
+
+  while(!(foundSpecial))
+  {
+    foundSpecial = isSpecialPoint(pointToCheck);
+    if( isSpecialPoint(pointToCheck) )
+    {
+	    // pointToCheck is a special point
+	    foundSpecial = true;
     }
     else
-     return false;
+    {
+	    // pointToCheck isn't a special point
+	    // increment step
+	    steps++;
+	    // a = a * generator % modulus
+	    NTL::MulMod(pointToCheck, pointToCheck, generator, modulus);
+    }
+  }
+
+  return steps;
 }
+
+int getStepsB(NTL::ZZ b, NTL::ZZ generator, NTL::ZZ modulus)
+{
+  // Similar to getStepsA except we have to inverse b first
+  NTL::ZZ pointToCheck = NTL::InvMod(b, modulus);
+
+  return getStepsA(b, generator, modulus);
+}
+
 string hexConverter(char hexValue)
 {
   string returnValue;
