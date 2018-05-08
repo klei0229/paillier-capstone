@@ -15,10 +15,44 @@
 
 #include <openssl/sha.h>
 
+#include <NTL/ZZ.h>
+#include <openssl/sha.h>
+
 using namespace std;
-//using namespace NTL;
+using namespace NTL;
 
+string decimalToHexical(int decimal_int);
+std::string zToString(const ZZ &z);
+string decimalToHexical(int decimal_int);
+std::string zToString(const ZZ &z);
+string decimalToHexical(int decimal_int);
+std::string zToString(const ZZ &z);
+bool isSpecialPoint(ZZ number);
+int getStepsA(NTL::ZZ a, NTL::ZZ generator, NTL::ZZ modulus);
+int getStepsB(NTL::ZZ b, NTL::ZZ generator, NTL::ZZ modulus);
+string hexConverter(char hexValue);
+string hextoBinaryString(string hexString);
+int maxConsecutiveZeroes(string String);
 
+int maxConsecutiveZeroes(string String){
+  int currentMax = 0;
+  int answer = 0;
+  for (int i = 0 ; i < String.length(); i++){
+
+    if(String[i] == '0')
+    {
+      currentMax++;
+    }
+    else{
+      if(currentMax > answer){
+        answer = currentMax;
+      }
+      currentMax = 0;
+    }
+  }
+  return answer;
+
+}
 string decimalToHexical(int decimal_int){
 
   string hexString = "";
@@ -32,23 +66,53 @@ string decimalToHexical(int decimal_int){
 
 }
 
-bool isSpecialPoint(NTL::ZZ point)
-{
-  // ulong to store left most 64bits of point
-  // SHA1 = 160 bits, to get 64 we get rid of 96 bits
-  unsigned long LM64 = ((SHA1(point)) << 96);
+std::string zToString(const ZZ &z){
+  std::stringstream buffer;
+  buffer << z;
+  return buffer.str();
+}
 
-  // Special point if LM64 is a number where first 10 leading bits are 0s
-  // Biggest possible # is 0b0000000000111111111111111111111111111111111111111111111111111111
-  // in decimal = 18014398509481983
-  if( LM64 <= 18014398509481983 )
-  {
-	  return true;
+// isspecialPoint should take the string version of a point ZZ
+bool isSpecialPoint(ZZ number)
+{
+  bool ret = false;
+
+  string input = zToString(number);
+  //convert zz point to string
+  //cout << "input string: " << input << endl;
+  //string to sha
+  unsigned char hash[20];
+
+  //sha1 expects a char input, input is in variable input (string version of ZZ Number)
+  SHA1((unsigned char*)input.c_str(), input.size(), hash);
+
+  //for debugging, the hash was displayed in its hex form
+  string resultHexString = "";
+       //returns the hash in decimal
+       //convert the hash to string in hexidedicmal
+       for(int i = 0; i < 20; ++i) {
+           resultHexString = resultHexString + decimalToHexical(int(hash[i]));
+       }
+
+  //resultHexString contains the hash as string in hexidedicmal
+        //cout << resultHexString << endl;
+  //sha to binary
+  string resultBinaryString = hextoBinaryString(resultHexString);
+        //cout << resultBinaryString << endl;
+
+  int maxZeroes = maxConsecutiveZeroes(resultBinaryString);
+  //cout << maxZeroes << endl;
+
+  if ( maxZeroes < 10){
+    ret = false;
   }
   else
-  {
-	  return false;
-  }
+  //count consecutive 0's if >10 then return true
+    {
+      ret = true;
+    }
+    //cout <<"result " <<ret<<endl;
+    return ret;
 }
 
 int getStepsA(NTL::ZZ a, NTL::ZZ generator, NTL::ZZ modulus)
@@ -131,95 +195,18 @@ int main(){
 
   //g++ ddlog.cpp -lcrypto
   //get ZZ a, b
+  ZZ number = ZZ(34);
+  ZZ g = ZZ(38483);
+  int steps = 0;
 
-  //sha256(a) sha256(b)
-
-  //take hash and shortern to 100 bits
-
-  //based off 100 bits , determine if is specialpoint
-  //cout << sha256('a") << endl;
-
-  //cout << "ddlog test" << endl;
-
-    // unsigned char digest[SHA_DIGEST_LENGTH];
-    // const char* text = "4";
-    //
-    // SHA_CTX ctx;
-    // SHA1_Init(&ctx);
-    // SHA1_Update(&ctx, text, strlen(text));
-    // SHA1_Final(digest, &ctx);
-    //
-    // char mdString[SHA_DIGEST_LENGTH*2+1];
-    // for (int i = 0; i < SHA_DIGEST_LENGTH; i++)
-    // {
-    //     sprintf(&mdString[i*2], "%02x", (unsigned int)digest[i]);
-    // }
+  while (isSpecialPoint(number) == false)
+  {
+    steps++;
+    number = number * g;
+  }
 
 
-    //cout << "decimal to hex "<< decimalToHexical(7562) << endl;
+  cout << "steps " << steps << endl;
 
-    string input;
-
-       // a sha1 hash is 20 bytes
-       unsigned char hash[20];
-
-       cout << "enter your string input a: ";
-       getline(cin, input);
-
-       // compute the sha1 of the input, and store it our  hash array
-       SHA1((unsigned char*)input.c_str(), input.size(), hash);
-       // the above is the exact same thing as doing:
-       //    SHA_CTX ctx;
-       //
-       //    SHA1_Init(&ctx);
-       //    SHA1_Update(&ctx, input.c_str(), input.size());
-       //    SHA1_Final(hash, &ctx);
-
-       // since the hash array just contains a bunch of bytes,
-       // print them as hexadecimal values
-       string resultHexString =  "";
-       //cout << "the hash was: ";
-
-
-       //returns the hash in decimal
-       //convert the hash to string in hexidedicmal
-       for(int i = 0; i < 20; ++i) {
-           resultHexString = resultHexString + decimalToHexical(int(hash[i]));
-       }
-      // cout <<"output"<< hexString1<<  endl;
-
-
-
-    //printf("SHA1 digest: %s\n", mdString);
-
-    //recieve string result from sha1
-
-    //change to ZZ
-    int a = 1;
-
-    //string resultHexString =  "1b6453892473a467d07372d45eb05abc2031647a";
-
-    string resultBinaryString = hextoBinaryString(resultHexString);
-
-
-    //calculate if is specialNumber
-
-    cout << "hexidecimal result: "<<resultHexString << endl;
-    cout << "binary result: "<< resultBinaryString << endl;
-
-    int generator;
-    int a_steps = 0;
-    //start testing for specialPoint
-  //  bool result = isSpecialPoint(resultBinaryString);
-    while ( !(isSpecialPoint(resultBinaryString)) ){
-      a_steps++;
-      a = a*generator;
-      //resultHexString= sha1(a);
-      //resultBinaryString = hextoBinary(resultHexString);
-    }
-
-
-    cout << a_steps << endl;
-    //this block goes into a loop once sha1 works
-
+  //new code
 }
