@@ -33,6 +33,7 @@ int getStepsB(NTL::ZZ b, NTL::ZZ generator, NTL::ZZ modulus);
 string hexConverter(char hexValue);
 string hextoBinaryString(string hexString);
 int maxConsecutiveZeroes(string String);
+ZZ ddlog(ZZ a, ZZ g);
 
 int maxConsecutiveZeroes(string String){
   int currentMax = 0;
@@ -191,22 +192,27 @@ string hextoBinaryString(string hexString){
   return binaryString;
 }
 
-int main(){
 
-  //g++ ddlog.cpp -lcrypto
-  //get ZZ a, b
-  ZZ number = ZZ(34);
-  ZZ g = ZZ(38483);
-  int steps = 0;
 
-  while (isSpecialPoint(number) == false)
+ZZ ddlog(ZZ a, ZZ g){
+
+  ZZ steps = ZZ(0);
+  while( isSpecialPoint(a) == false)
   {
     steps++;
-    number = number * g;
+    number = a * g;
   }
 
+  return steps;
+}
+int main(){
+  ZZ answer = ZZ(0);
+  ZZ a = ZZ();
+  ZZ g = ZZ();
+  answer = ddlog(a,g);
 
-  cout << "steps " << steps << endl;
+  cout << answer << endl;
+
 
   //new code
 }
