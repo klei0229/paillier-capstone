@@ -1,59 +1,9 @@
-#include <iostream>
-#include <math.h>
-#include <algorithm>
-#include <stdlib.h>
-#include <time.h>
-#include <assert.h>
-
-#include <iostream>
-#include <fstream>
-#include <sstream>
-
-#include <iomanip>
-
-#include <cstring>
-
-#include <openssl/sha.h>
-
-#include <NTL/ZZ.h>
-#include <openssl/sha.h>
+#include "ddlog.h"
 
 using namespace std;
 using namespace NTL;
 
-string decimalToHexical(int decimal_int);
-std::string zToString(const ZZ &z);
-string decimalToHexical(int decimal_int);
-std::string zToString(const ZZ &z);
-string decimalToHexical(int decimal_int);
-std::string zToString(const ZZ &z);
-bool isSpecialPoint(ZZ number);
-int getStepsA(NTL::ZZ a, NTL::ZZ generator, NTL::ZZ modulus);
-int getStepsB(NTL::ZZ b, NTL::ZZ generator, NTL::ZZ modulus);
-string hexConverter(char hexValue);
-string hextoBinaryString(string hexString);
-int maxConsecutiveZeroes(string String);
-ZZ ddlog(ZZ a, ZZ g);
-
-int maxConsecutiveZeroes(string String){
-  int currentMax = 0;
-  int answer = 0;
-  for (int i = 0 ; i < String.length(); i++){
-
-    if(String[i] == '0')
-    {
-      currentMax++;
-    }
-    else{
-      if(currentMax > answer){
-        answer = currentMax;
-      }
-      currentMax = 0;
-    }
-  }
-  return answer;
-
-}
+namespace ddlog{
 string decimalToHexical(int decimal_int){
 
   string hexString = "";
@@ -66,16 +16,13 @@ string decimalToHexical(int decimal_int){
   return hexString;
 
 }
-
 std::string zToString(const ZZ &z){
   std::stringstream buffer;
   buffer << z;
   return buffer.str();
 }
 
-
-bool isSpecialPoint(NTL::ZZ point)
-{
+bool isSpecialPoint(NTL::ZZ point){
   // ulong to store left most 64bits of point
   // SHA1 = 160 bits, to get 64 we get rid of 96 bits
   //unsigned long LM64 = ((SHA1(point)) << 96);
@@ -98,13 +45,13 @@ bool isSpecialPoint(NTL::ZZ point)
        }
 
   //resultHexString contains the hash as string in hexidedicmal
-        cout << resultHexString << endl;
+        //cout << "HEX String of sha1 "<<resultHexString << endl;
   //sha to binary
   string resultBinaryString = hextoBinaryString(resultHexString);
-  cout <<"binary string is "<< resultBinaryString << endl;
+  //cout <<"binary string is "<< resultBinaryString << "end"<< endl;
 
   bool isSpecial = true;
-  for(int i = 0; i < 10; ++i)
+  for(int i = resultBinaryString.length(); i >= resultBinaryString.length() - 3 ; --i)
   {
     if (resultBinaryString[i] == '1')
     {
@@ -119,9 +66,7 @@ bool isSpecialPoint(NTL::ZZ point)
   // Biggest possible # is 0b0000000000111111111111111111111111111111111111111111111111111111
   // in decimal = 18014398509481983
 }
-
-int getStepsA(NTL::ZZ a, NTL::ZZ generator, NTL::ZZ modulus)
-{
+int getStepsA(NTL::ZZ a, NTL::ZZ generator, NTL::ZZ modulus){
   // This func is to get # of steps for a to get to a special point
 
   int steps = 0;
@@ -131,13 +76,18 @@ int getStepsA(NTL::ZZ a, NTL::ZZ generator, NTL::ZZ modulus)
   while(!(foundSpecial))
   {
     foundSpecial = isSpecialPoint(pointToCheck);
-    if( isSpecialPoint(pointToCheck) )
+    //cout << "current step is " << steps << " current num is " << pointToCheck << " foundSpecial: "<< foundSpecial << endl;
+    // if( isSpecialPoint(pointToCheck) )
+    if ( foundSpecial )
     {
+      //cout << "Found special branch entered." << endl;
 	    // pointToCheck is a special point
-	    foundSpecial = true;
+	    // foundSpecial = true;
+      return steps;
     }
     else
     {
+      //cout << "Not special branch entered." << endl;
 	    // pointToCheck isn't a special point
 	    // increment step
 	    steps++;
@@ -145,65 +95,20 @@ int getStepsA(NTL::ZZ a, NTL::ZZ generator, NTL::ZZ modulus)
 	    NTL::MulMod(pointToCheck, pointToCheck, generator, modulus);
     }
   }
-  return steps;
 }
-
 int getStepsB(NTL::ZZ b, NTL::ZZ generator, NTL::ZZ modulus)
 {
+  //cout << "getStepsB" << endl;
   // Similar to getStepsA except we have to inverse b first
   NTL::ZZ pointToCheck = NTL::InvMod(b, modulus);
 
-  return getStepsA(b, generator, modulus);
-}
-
-
-
-// isspecialPoint should take the string version of a point ZZ
-bool isSpecialPoint1(ZZ number)
-{
-  bool ret = false;
-
-  string input = zToString(number);
-  //convert zz point to string
-  //cout << "input string: " << input << endl;
-  //string to sha
-  unsigned char hash[20];
-
-  //sha1 expects a char input, input is in variable input (string version of ZZ Number)
-  SHA1((unsigned char*)input.c_str(), input.size(), hash);
-
-  //for debugging, the hash was displayed in its hex form
-  string resultHexString = "";
-       //returns the hash in decimal
-       //convert the hash to string in hexidedicmal
-       for(int i = 0; i < 20; ++i) {
-           resultHexString = resultHexString + decimalToHexical(int(hash[i]));
-       }
-
-  //resultHexString contains the hash as string in hexidedicmal
-        //cout << resultHexString << endl;
-  //sha to binary
-  string resultBinaryString = hextoBinaryString(resultHexString);
-        //cout << resultBinaryString << endl;
-
-  int maxZeroes = maxConsecutiveZeroes(resultBinaryString);
-  //cout << maxZeroes << endl;
-
-  if ( maxZeroes < 10){
-    ret = false;
-  }
-  else
-  //count consecutive 0's if >10 then return true
-    {
-      ret = true;
-    }
-    //cout <<"result " <<ret<<endl;
-    return ret;
+  return getStepsA(pointToCheck, generator, modulus);
 }
 
 
 string hexConverter(char hexValue)
 {
+  //converts chair that is in hexFormato a string type binary format
   string returnValue;
 
   if(hexValue == '0') returnValue = "0000";
@@ -230,39 +135,12 @@ string hexConverter(char hexValue)
 }
 
 string hextoBinaryString(string hexString){
-
   string binaryString = "";
-
+  //takes a hex string and converts to a binary string
   for (int i = 0 ; i < hexString.length(); i++){
     binaryString = binaryString + hexConverter(hexString[i]);
   }
-
-
   return binaryString;
 }
 
-
-
-ZZ ddlog(ZZ a, ZZ g){
-
-  ZZ steps = ZZ(0);
-  while( isSpecialPoint(a) == false)
-  {
-    steps++;
-    //number = a * g;
-  }
-
-  return steps;
-}
-int main(){
-  ZZ answer = ZZ(0);
-  ZZ a = ZZ(58439583);
-  ZZ g = ZZ(54859348);
-  ZZ modulus = ZZ(4942);
-  answer = getStepsA(a,g,modulus);
-
-  //cout << answer << endl;
-
-
-  //new code
 }

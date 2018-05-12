@@ -20,4 +20,4 @@ LIBFLAGS:=$(addprefix -l, $(LIBS));
 
 main : ddlog.cpp
 		#g++ -g -Wall -Wpedantic $^ -o $@ $(LIBFLAGS)
-		g++ -g -O2 -I/home/kevin/usr/local/include ddlog.cpp -o ddlog -L/home/kevin/usr/local/lib/ -lntl -lgmp -lm -lssl -lcrypto
+		g++ -g -O2 -I/home/kevin/usr/local/include main_ddlog.cpp ddlog.cpp -o ddlog -L/home/kevin/usr/local/lib/ -lntl -lgmp -lm -lssl -lcrypto
