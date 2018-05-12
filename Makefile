@@ -13,6 +13,11 @@
 LIBS:=ntl gmp m ssl crypto
 LIBFLAGS:=$(addprefix -l, $(LIBS));
 
-main : main.cpp paillier.cpp
-	g++ -g -Wall -Wpedantic $^ -o $@ $(LIBFLAGS)
+#main : main.cpp paillier.cpp
+	#g++ -g -Wall -Wpedantic $^ -o $@ $(LIBFLAGS)
 	#g++ -g -O2 -I/home/kevin/usr/local/include main.cpp paillier.cpp -o main -L/home/kevin/usr/local/lib/ -lntl -lgmp -lm
+
+
+main : ddlog.cpp
+		#g++ -g -Wall -Wpedantic $^ -o $@ $(LIBFLAGS)
+		g++ -g -O2 -I/home/kevin/usr/local/include ddlog.cpp -o ddlog -L/home/kevin/usr/local/lib/ -lntl -lgmp -lm -lssl -lcrypto

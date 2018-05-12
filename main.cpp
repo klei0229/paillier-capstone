@@ -8,6 +8,9 @@
 #include <iostream>
 #include <fstream>
 
+#include <sstream>
+#include <string>
+
 #include "paillier.h"
 
 using namespace std;

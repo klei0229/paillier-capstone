@@ -73,8 +73,93 @@ std::string zToString(const ZZ &z){
   return buffer.str();
 }
 
+
+bool isSpecialPoint(NTL::ZZ point)
+{
+  // ulong to store left most 64bits of point
+  // SHA1 = 160 bits, to get 64 we get rid of 96 bits
+  //unsigned long LM64 = ((SHA1(point)) << 96);
+
+  string input = zToString(point);
+  //convert zz point to string
+  //cout << "input string: " << input << endl;
+  //string to sha
+  unsigned char hash[20];
+
+  //sha1 expects a char input, input is in variable input (string version of ZZ Number)
+  SHA1((unsigned char*)input.c_str(), input.size(), hash);
+
+  //for debugging, the hash was displayed in its hex form
+  string resultHexString = "";
+       //returns the hash in decimal
+       //convert the hash to string in hexidedicmal
+       for(int i = 0; i < 20; ++i) {
+           resultHexString = resultHexString + decimalToHexical(int(hash[i]));
+       }
+
+  //resultHexString contains the hash as string in hexidedicmal
+        cout << resultHexString << endl;
+  //sha to binary
+  string resultBinaryString = hextoBinaryString(resultHexString);
+  cout <<"binary string is "<< resultBinaryString << endl;
+
+  bool isSpecial = true;
+  for(int i = 0; i < 10; ++i)
+  {
+    if (resultBinaryString[i] == '1')
+    {
+      isSpecial = false;
+    }
+  }
+
+  return isSpecial;
+  //unsigned long LM64 = ((SHA1(point)) << 96);
+
+  // Special point if LM64 is a number where first 10 leading bits are 0s
+  // Biggest possible # is 0b0000000000111111111111111111111111111111111111111111111111111111
+  // in decimal = 18014398509481983
+}
+
+int getStepsA(NTL::ZZ a, NTL::ZZ generator, NTL::ZZ modulus)
+{
+  // This func is to get # of steps for a to get to a special point
+
+  int steps = 0;
+  bool foundSpecial = false;
+  NTL::ZZ pointToCheck = a;
+
+  while(!(foundSpecial))
+  {
+    foundSpecial = isSpecialPoint(pointToCheck);
+    if( isSpecialPoint(pointToCheck) )
+    {
+	    // pointToCheck is a special point
+	    foundSpecial = true;
+    }
+    else
+    {
+	    // pointToCheck isn't a special point
+	    // increment step
+	    steps++;
+	    // a = a * generator % modulus
+	    NTL::MulMod(pointToCheck, pointToCheck, generator, modulus);
+    }
+  }
+  return steps;
+}
+
+int getStepsB(NTL::ZZ b, NTL::ZZ generator, NTL::ZZ modulus)
+{
+  // Similar to getStepsA except we have to inverse b first
+  NTL::ZZ pointToCheck = NTL::InvMod(b, modulus);
+
+  return getStepsA(b, generator, modulus);
+}
+
+
+
 // isspecialPoint should take the string version of a point ZZ
-bool isSpecialPoint(ZZ number)
+bool isSpecialPoint1(ZZ number)
 {
   bool ret = false;
 
@@ -116,42 +201,6 @@ bool isSpecialPoint(ZZ number)
     return ret;
 }
 
-int getStepsA(NTL::ZZ a, NTL::ZZ generator, NTL::ZZ modulus)
-{
-  // This func is to get # of steps for a to get to a special point
-
-  int steps = 0;
-  bool foundSpecial = false;
-  NTL::ZZ pointToCheck = a;
-
-  while(!(foundSpecial))
-  {
-    foundSpecial = isSpecialPoint(pointToCheck);
-    if( isSpecialPoint(pointToCheck) )
-    {
-	    // pointToCheck is a special point
-	    foundSpecial = true;
-    }
-    else
-    {
-	    // pointToCheck isn't a special point
-	    // increment step
-	    steps++;
-	    // a = a * generator % modulus
-	    NTL::MulMod(pointToCheck, pointToCheck, generator, modulus);
-    }
-  }
-
-  return steps;
-}
-
-int getStepsB(NTL::ZZ b, NTL::ZZ generator, NTL::ZZ modulus)
-{
-  // Similar to getStepsA except we have to inverse b first
-  NTL::ZZ pointToCheck = NTL::InvMod(b, modulus);
-
-  return getStepsA(b, generator, modulus);
-}
 
 string hexConverter(char hexValue)
 {
@@ -200,18 +249,19 @@ ZZ ddlog(ZZ a, ZZ g){
   while( isSpecialPoint(a) == false)
   {
     steps++;
-    number = a * g;
+    //number = a * g;
   }
 
   return steps;
 }
 int main(){
   ZZ answer = ZZ(0);
-  ZZ a = ZZ();
-  ZZ g = ZZ();
-  answer = ddlog(a,g);
+  ZZ a = ZZ(58439583);
+  ZZ g = ZZ(54859348);
+  ZZ modulus = ZZ(4942);
+  answer = getStepsA(a,g,modulus);
 
-  cout << answer << endl;
+  //cout << answer << endl;
 
 
   //new code
